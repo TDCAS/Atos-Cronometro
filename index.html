@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background-color: black;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    .container-cronometro {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh; /* Altura completa da tela */
+      text-align: center;
+      color: white;
+    }
+
+    .container-verde {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 80vw;  /* 80% da largura da tela */
+      max-width: 50vw;
+      height: 50vh;  /* 30% da altura da tela */
+      max-height: 80vw;
+      background-color: green;
+      border-radius: 3.5vw;
+      margin-bottom: 20px;
+    }
+
+    #cronometro {
+      font-size: 5vw;  /* Tamanho da fonte adaptável */
+      font-weight: 500;
+      color: white;
+      background-color: black;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+    }
+
+    #containerTimerEnd input {
+      width: 3.5vw;
+      text-align: center;
+      font-size: 2.5vw;  /* Tamanho da fonte adaptável */
+      margin: 0 5px;
+      border: none;
+      outline: none;
+      background: none;
+      color: white;
+    }
+
+    #containerTimerEnd {
+      margin-bottom: 20px;
+      font-size: 2.5vw;  /* Tamanho da fonte adaptável */
+    }
+
+    /* Estilização dos botões */
+    .button-container {
+      display: flex;
+      justify-content: center;
+      gap: 10px; /* Espaçamento entre os botões */
+      margin-top: 20px;
+    }
+
+    button {
+      font-size: 1.5vw;  /* Reduzindo o tamanho da fonte */
+      padding: 8px 16px;
+      border: 1px solid #555;  /* Borda mais discreta */
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: #333;  /* Cor de fundo mais escura */
+      color: white;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #555;  /* Mudança de cor ao passar o mouse */
+    }
+
+    /* Media Queries para telas menores */
+    @media (max-width: 600px) {
+      .container-verde {
+        width: 90vw;  /* Mais largura em telas pequenas */
+      }
+
+      #cronometro {
+        font-size: 8vw;  /* Fonte maior para telas pequenas */
+        
+      }
+
+      #containerTimerEnd input {
+        font-size: 4vw;  /* Fonte maior para entradas de tempo em telas pequenas */
+        width: 5.5vw;
+      }
+
+      button {
+        font-size: 3vw;  /* Fonte maior para botões em telas pequenas */
+      }
+    }
+  </style>
+  <title>Cronômetro</title>
+</head>
+<body>
+  <section class="container-cronometro">
+    <div class="container-verde" id="containerVerde">
+      <div id="cronometro">00:00:00</div>
+    </div>
+
+    <div id="containerTimerEnd">
+      <input type="text" id="TimerEndhours" maxlength="2" value="00" oninput="this.value = this.value.replace(/[^0-9]/g, '');">:
+      <input type="text" id="TimerEndMinuts" maxlength="2" value="00" oninput="this.value = this.value.replace(/[^0-9]/g, '');">:
+      <input type="text" id="TimerEndSeconds" maxlength="2" value="00" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+    </div>
+
+    <div class="button-container">
+      <button onclick="start()">Iniciar</button>
+      <button onclick="pause()">Pausar</button>
+      <button onclick="reset()">Resetar</button>
+    </div>
+
+  </section>
+
+ 
+  <script>
+    let segundos = 0;
+    let minutos = 0;
+    let horas = 0;
+    let intervalo = null;
+
+    function doisDigitos(digito) {
+      return digito < 10 ? '0' + digito : digito;
+    }
+
+    function start() {
+      if (intervalo !== null) {
+        return; // Se já estiver rodando, não faz nada
+      }
+
+      intervalo = setInterval(async () => {
+        await segundos++;
+
+        if (segundos === 60) {
+          segundos = 0;
+          minutos++;
+
+          if (minutos === 60) {
+            minutos = 0;
+            horas++;
+          }
+        }
+        await TimeEnd(horas, minutos, segundos)
+        document.getElementById('cronometro').innerText = await `${doisDigitos(horas)}:${doisDigitos(minutos)}:${doisDigitos(segundos)}`;
+      }, 1000);
+    }
+
+    function pause() {
+      clearInterval(intervalo);
+      intervalo = null;
+    }
+
+    function reset() {
+      clearInterval(intervalo);
+      intervalo = null;
+      segundos = 0;
+      minutos = 0;
+      horas = 0;
+      let containerTimerEnd = document.getElementById("containerVerde");
+      containerTimerEnd.style.backgroundColor = "green";
+      document.getElementById('cronometro').innerText = "00:00:00";
+    }
+
+    function TimeEnd(horas, minutos, segundos) {
+      let TimerEndhours = document.getElementById("TimerEndhours").value;
+      let TimerEndMinuts = document.getElementById("TimerEndMinuts").value;
+      let TimerEndSeconds = document.getElementById("TimerEndSeconds").value;
+
+      let totalSegundos = Number(minutos * 60);
+      totalSegundos += Number(horas * 3600);
+      totalSegundos += Number(segundos);
+
+      let cont = converterParaMinutos(TimerEndhours, TimerEndMinuts, TimerEndSeconds);
+      if (Number((cont * 0.75).toFixed(0)) === totalSegundos) {
+        let containerTimerEnd = document.getElementById("containerVerde");
+        containerTimerEnd.style.backgroundColor = "yellow";
+      }
+      if (cont === totalSegundos) {
+        let containerTimerEnd = document.getElementById("containerVerde");
+        containerTimerEnd.style.backgroundColor = "red";
+      }
+    }
+
+    function converterParaMinutos(horas, minutos, segundos) {
+      let totalSegundos = Number(minutos * 60);
+      totalSegundos += Number(horas * 3600);
+      return totalSegundos += Number(segundos);
+    }
+  </script>
+</body>
+</html>

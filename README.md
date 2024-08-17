@@ -26,42 +26,42 @@ Siga os passos abaixo para clonar e rodar o projeto localmente:
    ```bash
    git clone https://github.com/TDCAS/Atos-Cronometro.git
 2. Navegue até o diretório do projeto:
-
+   ```bash
    cd Atos-Cronometro
 
-3. Instale as dependências:
-
+4. Instale as dependências:
+   ```bash
    npm install
 
-4. Inicie o aplicativo:
-
+5. Inicie o aplicativo:
+   ```bash
    npm start
 
 ## Empacotando o Aplicativo
 Para criar uma versão distribuível do aplicativo, você pode usar o electron-packager ou electron-builder.
 
 1. Usando electron-packager:
-
+   ```bash
    npm install -g electron-packager
 
 2. Empacote o aplicativo:
-  
+   ```bash
    electron-packager . Atos-Cronometro --platform=win32 --arch=x64 --icon=assets/icon.ico
 
 ## Usando electron-builder:
 
 1. Instale o electron-builder como dependência de desenvolvimento:
-   
+   ```bash
    npm install --save-dev electron-builder
 
 2. Adicione um script ao package.json:
-
+   ```bash
     "scripts": {
-  "build": "electron-builder"
-}
+     "build": "electron-builder"
+   }
 
 3. Empacote o aplicativo:
-   
+   ```bash
    npm run build
 
 
